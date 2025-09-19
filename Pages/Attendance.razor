@@ -1,0 +1,52 @@
+﻿@page "/attendance"
+@inject AppState App
+
+<h1>Attendance</h1>
+
+@if (string.IsNullOrWhiteSpace(App.CurrentUser))
+{
+    <p>Please register first to create your session identity.</p>
+    <a class="btn" href="/register">Go to Register</a>
+}
+else
+{
+    <p class="muted">Current user: <strong>@App.CurrentUser</strong></p>
+
+    <div class="form-inline">
+        <input placeholder="Add attendee name" @bind="newAttendee" @bind:event="oninput" />
+        <button class="btn" @onclick="Add">Add</button>
+    </div>
+
+    @if (Attendees.Count == 0)
+    {
+        <p>No attendees yet.</p>
+    }
+    else
+    {
+        <ul class="plain">
+            @foreach (var a in Attendees)
+            {
+                <li>
+                    <span>@a</span>
+                    <button class="btn tiny danger" @onclick="() => Remove(a)">x</button>
+                </li>
+            }
+        </ul>
+    }
+}
+
+@code {
+    private string newAttendee = "";
+    private List<string> Attendees { get; } = new();
+
+    private void Add()
+    {
+        if (!string.IsNullOrWhiteSpace(newAttendee))
+        {
+            Attendees.Add(newAttendee.Trim());
+            newAttendee = "";
+        }
+    }
+
+    private void Remove(string name) => Attendees.Remove(name);
+}

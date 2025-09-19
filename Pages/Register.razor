@@ -1,0 +1,45 @@
+﻿@page "/register"
+@using System.ComponentModel.DataAnnotations
+@inject AppState App
+
+<h1>Register</h1>
+
+<EditForm Model="@model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-grid">
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="model.Name" />
+
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="model.Email" type="email" />
+
+        <label for="aff">Affiliation</label>
+        <InputText id="aff" @bind-Value="model.Affiliation" />
+    </div>
+
+    <button class="btn" type="submit">Register</button>
+</EditForm>
+
+@if (!string.IsNullOrWhiteSpace(App.CurrentUser))
+{
+    <p class="muted mt8">Signed in as <strong>@App.CurrentUser</strong></p>
+}
+
+@code {
+    private Registration model = new();
+
+    private void OnValidSubmit()
+    {
+        App.CurrentUser = model.Name;
+        StateHasChanged();
+    }
+
+    public class Registration
+    {
+        [Required] public string Name { get; set; } = string.Empty;
+        [Required, EmailAddress] public string Email { get; set; } = string.Empty;
+        public string? Affiliation { get; set; }
+    }
+}

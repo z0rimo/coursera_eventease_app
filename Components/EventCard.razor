@@ -1,0 +1,58 @@
+﻿@using EventEase.Models
+
+<div class="event-card">
+    <label>
+        <span>Title</span>
+        <input value="@Value.Title" @oninput="OnTitleInput" />
+    </label>
+
+    <label>
+        <span>Date</span>
+        <input type="date"
+               value="@Value.Date.ToString("yyyy-MM-dd")"
+               @oninput="OnDateInput" />
+    </label>
+
+    <label>
+        <span>Location</span>
+        <input value="@Value.Location" @oninput="OnLocationInput" />
+    </label>
+
+    <label>
+        <span>Description</span>
+        <textarea rows="3" @oninput="OnDescriptionInput">@Value.Description</textarea>
+    </label>
+</div>
+
+@code {
+    [Parameter] public EventItem Value { get; set; } = new();
+    [Parameter] public EventCallback<EventItem> ValueChanged { get; set; }
+
+    void OnTitleInput(ChangeEventArgs e)
+    {
+        Value.Title = e.Value?.ToString() ?? string.Empty;
+        _ = ValueChanged.InvokeAsync(Value);
+    }
+
+    void OnDateInput(ChangeEventArgs e)
+    {
+        var s = e.Value?.ToString();
+        if (!string.IsNullOrWhiteSpace(s) && DateTime.TryParse(s, out var dt))
+        {
+            Value.Date = dt.Date;
+            _ = ValueChanged.InvokeAsync(Value);
+        }
+    }
+
+    void OnLocationInput(ChangeEventArgs e)
+    {
+        Value.Location = e.Value?.ToString() ?? string.Empty;
+        _ = ValueChanged.InvokeAsync(Value);
+    }
+
+    void OnDescriptionInput(ChangeEventArgs e)
+    {
+        Value.Description = e.Value?.ToString();
+        _ = ValueChanged.InvokeAsync(Value);
+    }
+}

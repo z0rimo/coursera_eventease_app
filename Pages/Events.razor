@@ -1,0 +1,75 @@
+﻿@page "/events"
+@using EventEase
+@using EventEase.Models
+@* EventCard는 같은 프로젝트/루트 네임스페이스라 추가 using 없이 인식됨 (필요하면 @using EventEase.Components 추가) *@
+@using EventEase.Components
+
+<h1>Events</h1>
+
+<section class="toolbar">
+    <button class="btn" @onclick="AddNew">+ Add Event</button>
+</section>
+
+@if (EventList.Count == 0)
+{
+    <p>No events yet. Create your first one!</p>
+}
+else
+{
+    <ul class="event-list">
+        @for (int i = 0; i < EventList.Count; i++)
+        {
+            var e = EventList[i];
+            <li class="event-row">
+                <div class="event-summary">
+                    <strong>@e.Title</strong>
+                    <span>@e.Date:ddd, MMM d yyyy</span>
+                    <span>@e.Location</span>
+                </div>
+                <div class="event-actions">
+                    <button class="btn ghost" @onclick="() => Select(i)">Edit</button>
+                    <button class="btn danger" @onclick="() => Remove(i)">Delete</button>
+                </div>
+            </li>
+        }
+    </ul>
+}
+
+@if (SelectedIndex is not null)
+{
+    <hr />
+    <h2>Edit Event</h2>
+    <EventCard @bind-Value="EventList[SelectedIndex.Value]" />
+    <div class="mt8">
+        <button class="btn" @onclick="Save">Save</button>
+        <button class="btn ghost" @onclick="Cancel">Cancel</button>
+    </div>
+}
+
+@code {
+    private List<EventItem> EventList { get; } = new()
+    {
+        new EventItem { Title="Blazor Conf", Date=DateTime.Today.AddDays(7),  Location="Online", Description="Keynotes, deep-dives" },
+        new EventItem { Title="UI Meetup",   Date=DateTime.Today.AddDays(14), Location="Seoul",  Description="Accessibility and design systems" }
+    };
+
+    private int? SelectedIndex { get; set; } = null;
+
+    private void AddNew()
+    {
+        EventList.Add(new EventItem { Title="New Event", Date=DateTime.Today, Location="TBD" });
+        SelectedIndex = EventList.Count - 1;
+    }
+
+    private void Select(int index) => SelectedIndex = index;
+
+    private void Remove(int index)
+    {
+        if (SelectedIndex == index) SelectedIndex = null;
+        EventList.RemoveAt(index);
+    }
+
+    private void Save() => SelectedIndex = null;
+
+    private void Cancel() => SelectedIndex = null;
+}
